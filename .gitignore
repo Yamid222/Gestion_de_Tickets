@@ -1,0 +1,14 @@
+# Ignorar vendors de microservicios
+microservicio-usuarios/vendor/
+microservicio-tickets/vendor/
+
+# Ignorar node_modules si luego usas npm
+frontend/node_modules/
+
+# Archivos del editor
+.vscode/
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
