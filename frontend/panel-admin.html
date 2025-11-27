@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Administrador - Tickets</title>
+    <link rel="stylesheet" href="css/estilos_generales.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+    <link rel="stylesheet" href="css/tickets.css" />
+    <link rel="stylesheet" href="css/usuarios.css" />
+</head>
+<body>
+    <header class="encabezado">
+        <h1>Panel de Administrador</h1>
+        <button id="btn-logout" class="btn-secundario">Cerrar sesión</button>
+    </header>
+
+    <main class="layout-panel">
+        <section class="panel-izquierdo">
+            <h2>Gestión de tickets</h2>
+            <div id="filtros-tickets" class="filtros"></div>
+            <div id="lista-tickets" class="lista-tickets"></div>
+        </section>
+
+        <section class="panel-derecho">
+            <h2>Detalle del ticket</h2>
+            <div id="detalle-ticket" class="detalle-ticket"></div>
+
+            <h2>Gestión de usuarios (estructura)</h2>
+            <div id="lista-usuarios" class="lista-usuarios"></div>
+        </section>
+    </main>
+
+    <script src="js/api/configuracion.js"></script>
+    <script src="js/api/api-tickets.js"></script>
+    <script src="js/api/api-usuarios.js"></script>
+    <script src="js/autenticacion/validar_token.js"></script>
+    <script src="js/autenticacion/cerrar_sesion.js"></script>
+    <script src="js/paneles/panel-admin.js"></script>
+</body>
+</html>

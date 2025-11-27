@@ -1,0 +1,185 @@
+/* ============================================
+   ESTILOS PARA GESTIÓN DE USUARIOS
+   ============================================ */
+
+.lista-usuarios {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar personalizado */
+.lista-usuarios::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lista-usuarios::-webkit-scrollbar-track {
+    background: var(--color-gris-claro);
+    border-radius: 4px;
+}
+
+.lista-usuarios::-webkit-scrollbar-thumb {
+    background: var(--color-azul-primario);
+    border-radius: 4px;
+}
+
+.lista-usuarios::-webkit-scrollbar-thumb:hover {
+    background: var(--color-azul-oscuro);
+}
+
+.usuario-item {
+    background-color: var(--color-blanco);
+    border: 2px solid var(--color-gris);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.usuario-item:hover {
+    border-color: var(--color-azul-primario);
+    box-shadow: var(--sombra-media);
+}
+
+.usuario-info {
+    flex: 1;
+}
+
+.usuario-info h4 {
+    color: var(--color-azul-primario);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.usuario-info p {
+    color: var(--color-texto);
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.usuario-info p:last-child {
+    margin-bottom: 0;
+}
+
+.role {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.role-gestor {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #3b82f6;
+}
+
+.role-admin {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+.usuario-acciones {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-editar-usuario,
+.btn-eliminar-usuario {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-editar-usuario {
+    background-color: var(--color-azul-primario);
+    color: var(--color-blanco);
+}
+
+.btn-editar-usuario:hover {
+    background-color: var(--color-azul-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--sombra-suave);
+}
+
+.btn-eliminar-usuario {
+    background-color: var(--color-error);
+    color: var(--color-blanco);
+}
+
+.btn-eliminar-usuario:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: var(--sombra-suave);
+}
+
+/* ============================================
+   FORMULARIO DE EDICIÓN DE USUARIO
+   ============================================ */
+
+.formulario-editar-usuario {
+    background-color: var(--color-blanco);
+    border: 2px solid var(--color-azul-primario);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: var(--sombra-fuerte);
+}
+
+.formulario-editar-usuario h3 {
+    color: var(--color-azul-primario);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-gris);
+}
+
+.formulario-editar-usuario .btn-primario,
+.formulario-editar-usuario .btn-secundario {
+    margin-top: 1rem;
+    margin-right: 0.75rem;
+}
+
+.btn-cancelar-edicion {
+    background-color: var(--color-gris);
+    color: var(--color-texto);
+    border: 2px solid var(--color-gris-oscuro);
+}
+
+.btn-cancelar-edicion:hover {
+    background-color: var(--color-gris-oscuro);
+    color: var(--color-blanco);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .usuario-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .usuario-acciones {
+        width: 100%;
+    }
+    
+    .btn-editar-usuario,
+    .btn-eliminar-usuario {
+        flex: 1;
+    }
+}
+

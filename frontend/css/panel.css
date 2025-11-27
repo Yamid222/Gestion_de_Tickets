@@ -1,0 +1,173 @@
+/* ============================================
+   ESTILOS PARA PANELES (GESTOR Y ADMIN)
+   ============================================ */
+
+.layout-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 0 2rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.panel-izquierdo,
+.panel-derecho {
+    background-color: var(--color-blanco);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: var(--sombra-media);
+    border: 1px solid var(--color-gris);
+}
+
+.panel-izquierdo h2,
+.panel-derecho h2 {
+    color: var(--color-azul-primario);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-gris);
+}
+
+/* ============================================
+   FILTROS
+   ============================================ */
+
+.filtros-contenedor {
+    background-color: var(--color-gris-claro);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-gris);
+}
+
+.filtros-contenedor h3 {
+    color: var(--color-azul-primario);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.filtro-grupo {
+    margin-bottom: 1rem;
+}
+
+.filtro-grupo:last-child {
+    margin-bottom: 0;
+}
+
+.filtro-grupo label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-texto);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.filtro-grupo select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 2px solid var(--color-gris);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background-color: var(--color-blanco);
+    color: var(--color-texto);
+}
+
+.filtro-grupo select:focus {
+    outline: none;
+    border-color: var(--color-azul-primario);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filtros-contenedor .btn-primario,
+.filtros-contenedor .btn-secundario {
+    margin-top: 1rem;
+    margin-right: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   CONTROLES DE ADMINISTRADOR
+   ============================================ */
+
+.admin-controls {
+    background-color: var(--color-gris-claro);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    border: 1px solid var(--color-gris);
+}
+
+.admin-controls h4 {
+    color: var(--color-azul-primario);
+    margin-bottom: 1rem;
+}
+
+.control-grupo {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.control-grupo:last-child {
+    margin-bottom: 0;
+}
+
+.control-grupo label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-texto);
+    font-weight: 500;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.control-grupo select {
+    flex: 2;
+    padding: 0.625rem;
+    border: 2px solid var(--color-gris);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background-color: var(--color-blanco);
+}
+
+.control-grupo .btn-primario {
+    flex: 1;
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .layout-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .layout-panel {
+        padding: 0 1rem 1rem;
+        gap: 1.5rem;
+    }
+    
+    .panel-izquierdo,
+    .panel-derecho {
+        padding: 1.5rem;
+    }
+    
+    .control-grupo {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-grupo select,
+    .control-grupo .btn-primario {
+        flex: 1;
+        width: 100%;
+    }
+}
+

@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /Gestion_de_Tickets/microservicio-usuarios/public/
+
+    # Si la petición es a un archivo o directorio físico, no reescribir
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Todo lo demás va a index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+

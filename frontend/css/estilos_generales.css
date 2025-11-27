@@ -1,0 +1,224 @@
+/* ============================================
+   ESTILOS GENERALES
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --color-azul-primario: #2563eb;
+    --color-azul-oscuro: #1e40af;
+    --color-azul-claro: #3b82f6;
+    --color-azul-hover: #1d4ed8;
+    --color-blanco: #ffffff;
+    --color-gris-claro: #f8fafc;
+    --color-gris: #e2e8f0;
+    --color-gris-oscuro: #64748b;
+    --color-texto: #1e293b;
+    --color-texto-claro: #64748b;
+    --color-exito: #10b981;
+    --color-error: #ef4444;
+    --color-advertencia: #f59e0b;
+    --sombra-suave: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --sombra-media: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --sombra-fuerte: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--color-blanco);
+    color: var(--color-texto);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ============================================
+   TIPOGRAFÍA
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-texto);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+}
+
+h4 {
+    font-size: 1.1rem;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btn-primario,
+.btn-secundario {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primario {
+    background-color: var(--color-azul-primario);
+    color: var(--color-blanco);
+    box-shadow: var(--sombra-suave);
+}
+
+.btn-primario:hover {
+    background-color: var(--color-azul-hover);
+    box-shadow: var(--sombra-media);
+    transform: translateY(-1px);
+}
+
+.btn-primario:active {
+    transform: translateY(0);
+}
+
+.btn-secundario {
+    background-color: var(--color-blanco);
+    color: var(--color-azul-primario);
+    border: 2px solid var(--color-azul-primario);
+}
+
+.btn-secundario:hover {
+    background-color: var(--color-gris-claro);
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+
+.campo-form {
+    margin-bottom: 1.5rem;
+}
+
+.campo-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-texto);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.campo-form input,
+.campo-form textarea,
+.campo-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--color-gris);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: var(--color-blanco);
+    color: var(--color-texto);
+    transition: border-color 0.2s ease;
+}
+
+.campo-form input:focus,
+.campo-form textarea:focus,
+.campo-form select:focus {
+    outline: none;
+    border-color: var(--color-azul-primario);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.campo-form input::placeholder,
+.campo-form textarea::placeholder {
+    color: var(--color-texto-claro);
+}
+
+/* ============================================
+   MENSAJES
+   ============================================ */
+
+.mensaje {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.mensaje.exito {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.mensaje.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+}
+
+.mensaje.info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #3b82f6;
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+
+.contenedor-principal {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.encabezado {
+    background-color: var(--color-blanco);
+    padding: 1.5rem 2rem;
+    box-shadow: var(--sombra-suave);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.encabezado h1 {
+    margin: 0;
+    color: var(--color-azul-primario);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .contenedor-principal {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.25rem;
+    }
+}
+

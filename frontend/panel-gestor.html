@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Gestor - Tickets</title>
+    <link rel="stylesheet" href="css/estilos_generales.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+    <link rel="stylesheet" href="css/tickets.css" />
+</head>
+<body>
+    <header class="encabezado">
+        <h1>Panel de Gestor</h1>
+        <button id="btn-logout" class="btn-secundario">Cerrar sesión</button>
+    </header>
+
+    <main class="layout-panel">
+        <section class="panel-izquierdo">
+            <h2>Crear nuevo ticket</h2>
+            <form id="form-crear-ticket">
+                <div class="campo-form">
+                    <label for="titulo">Título</label>
+                    <input type="text" id="titulo" required />
+                </div>
+                <div class="campo-form">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn-primario">Crear ticket</button>
+            </form>
+            <p id="mensaje-ticket" class="mensaje"></p>
+        </section>
+
+        <section class="panel-derecho">
+            <h2>Mis tickets</h2>
+            <div id="lista-tickets" class="lista-tickets"></div>
+            <div id="detalle-ticket" class="detalle-ticket"></div>
+        </section>
+    </main>
+
+    <script src="js/api/configuracion.js"></script>
+    <script src="js/api/api-tickets.js"></script>
+    <script src="js/api/api-usuarios.js"></script>
+    <script src="js/autenticacion/validar_token.js"></script>
+    <script src="js/autenticacion/cerrar_sesion.js"></script>
+    <script src="js/paneles/panel-gestor.js"></script>
+</body>
+</html>

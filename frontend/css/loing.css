@@ -1,0 +1,45 @@
+/* ============================================
+   ESTILOS PARA PÁGINA DE LOGIN
+   ============================================ */
+
+.tarjeta-login {
+    background-color: var(--color-blanco);
+    border-radius: 1rem;
+    box-shadow: var(--sombra-fuerte);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid var(--color-gris);
+}
+
+.tarjeta-login h1 {
+    color: var(--color-azul-primario);
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+}
+
+.tarjeta-login h2 {
+    text-align: center;
+    color: var(--color-texto-claro);
+    font-weight: 400;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.tarjeta-login form {
+    margin-top: 1.5rem;
+}
+
+.tarjeta-login .btn-primario {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+#mensaje-login {
+    margin-top: 1rem;
+    text-align: center;
+}
+
