@@ -44,6 +44,30 @@ async function apiObtenerUsuario(id) {
     return resp.json();
 }
 
+async function apiCrearUsuario(datos) {
+    const token = localStorage.getItem('token');
+
+    const resp = await fetch(`${BASE_URL_USUARIOS}/api/usuarios`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(datos)
+    });
+
+    if (!resp.ok) {
+        if (resp.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            window.location.href = 'index.html';
+            return { success: false, message: 'Sesión expirada' };
+        }
+    }
+
+    return resp.json();
+}
+
 async function apiActualizarUsuario(id, datos) {
     const token = localStorage.getItem('token');
 

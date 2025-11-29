@@ -125,8 +125,17 @@ async function apiActualizarEstadoTicket(id, estado, user_id, mensaje = null) {
     return resp.json();
 }
 
-async function apiAsignarTicket(id, admin_id, user_id) {
+async function apiAsignarTicket(id, admin_id, user_id, admin_nombre = null) {
     const token = localStorage.getItem('token');
+
+    const payload = {
+        admin_id,
+        user_id
+    };
+
+    if (admin_nombre) {
+        payload.admin_nombre = admin_nombre;
+    }
 
     const resp = await fetch(`${BASE_URL_TICKETS}/api/tickets/${id}/asignar`, {
         method: 'PUT',
@@ -134,10 +143,7 @@ async function apiAsignarTicket(id, admin_id, user_id) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-            admin_id,
-            user_id
-        })
+        body: JSON.stringify(payload)
     });
 
     if (!resp.ok) {

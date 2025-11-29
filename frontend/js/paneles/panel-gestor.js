@@ -3,6 +3,9 @@
 
 (function() {
     let usuario = null;
+    const etiquetaUsuarioNombre = document.getElementById('usuario-nombre');
+    const etiquetaUsuarioCorreo = document.getElementById('usuario-correo');
+    const etiquetaUsuarioId = document.getElementById('usuario-id');
     const formCrearTicket = document.getElementById('form-crear-ticket');
     const mensajeTicket = document.getElementById('mensaje-ticket');
     const listaTickets = document.getElementById('lista-tickets');
@@ -27,6 +30,18 @@
         }
 
         console.log('Usuario cargado:', usuario);
+
+        if (etiquetaUsuarioNombre) {
+            const nombre = usuario.name || 'Usuario autenticado';
+            etiquetaUsuarioNombre.textContent = `Nombre: ${nombre}`;
+        }
+        if (etiquetaUsuarioCorreo) {
+            const correo = usuario.email || 'Sin correo disponible';
+            etiquetaUsuarioCorreo.textContent = `Correo: ${correo}`;
+        }
+        if (etiquetaUsuarioId) {
+            etiquetaUsuarioId.textContent = `ID: ${usuario.id ?? 'N/D'}`;
+        }
 
         // Cargar tickets al iniciar
         cargarTickets();
@@ -116,9 +131,13 @@
             return;
         }
 
+        const nombreGestor = usuario.name || 'Usuario autenticado';
+        const correoGestor = usuario.email || 'Sin correo disponible';
+
         const html = tickets.map(ticket => {
             const estadoClass = `estado-${ticket.estado}`;
             const fecha = new Date(ticket.created_at).toLocaleDateString('es-ES');
+            const descripcion = ticket.descripcion || '';
             
             return `
                 <div class="ticket-item" data-id="${ticket.id}">
@@ -127,7 +146,8 @@
                         <span class="estado ${estadoClass}">${ticket.estado}</span>
                         <span class="fecha">${fecha}</span>
                     </p>
-                    <p class="ticket-descripcion">${ticket.descripcion.substring(0, 100)}${ticket.descripcion.length > 100 ? '...' : ''}</p>
+                    <p class="ticket-creador">Creado por: ${nombreGestor} (${correoGestor})</p>
+                    <p class="ticket-descripcion">${descripcion.substring(0, 100)}${descripcion.length > 100 ? '...' : ''}</p>
                     <button class="btn-ver-detalle" data-id="${ticket.id}">Ver detalles</button>
                 </div>
             `;
@@ -165,6 +185,8 @@
         const estadoClass = `estado-${ticket.estado}`;
         const fechaCreacion = new Date(ticket.created_at).toLocaleString('es-ES');
         const fechaActualizacion = new Date(ticket.updated_at).toLocaleString('es-ES');
+        const nombreGestor = usuario.name || 'Usuario autenticado';
+        const correoGestor = usuario.email || 'Sin correo disponible';
 
         let actividadesHtml = '';
         if (ticket.actividades && ticket.actividades.length > 0) {
@@ -188,6 +210,7 @@
                     <p><strong>Estado:</strong> <span class="estado ${estadoClass}">${ticket.estado}</span></p>
                     <p><strong>Creado:</strong> ${fechaCreacion}</p>
                     <p><strong>Última actualización:</strong> ${fechaActualizacion}</p>
+                    <p><strong>Gestor:</strong> ${nombreGestor} (${correoGestor})</p>
                 </div>
                 <div class="ticket-descripcion-completa">
                     <h4>Descripción:</h4>

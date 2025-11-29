@@ -95,6 +95,15 @@ class TicketController
                 $query->where('gestor_id', $queryParams['user_id']);
             }
 
+            // Búsqueda por texto (título o descripción)
+            if (!empty($queryParams['buscar'])) {
+                $buscar = $queryParams['buscar'];
+                $query->where(function($q) use ($buscar) {
+                    $q->where('titulo', 'LIKE', "%{$buscar}%")
+                      ->orWhere('descripcion', 'LIKE', "%{$buscar}%");
+                });
+            }
+
             $tickets = $query->orderBy('created_at', 'desc')->get();
 
             $response->getBody()->write(json_encode([
@@ -235,7 +244,9 @@ class TicketController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
-            $ticket->asignarAdmin($data['admin_id'], $data['user_id']);
+            $adminNombre = $data['admin_nombre'] ?? null;
+
+            $ticket->asignarAdmin($data['admin_id'], $data['user_id'], $adminNombre);
             $ticket->load('actividades');
 
             $response->getBody()->write(json_encode([

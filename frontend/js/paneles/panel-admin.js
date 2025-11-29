@@ -10,24 +10,65 @@
         window.location.href = 'index.html';
         return;
     }
+    
+    const etiquetaUsuarioNombre = document.getElementById('usuario-nombre');
+    const etiquetaUsuarioCorreo = document.getElementById('usuario-correo');
+    const etiquetaUsuarioId = document.getElementById('usuario-id');
+    if (etiquetaUsuarioNombre) {
+        const nombre = usuario.name || 'Usuario autenticado';
+        etiquetaUsuarioNombre.textContent = `Nombre: ${nombre}`;
+    }
+    if (etiquetaUsuarioCorreo) {
+        const correo = usuario.email || 'Sin correo disponible';
+        etiquetaUsuarioCorreo.textContent = `Correo: ${correo}`;
+    }
+    if (etiquetaUsuarioId) {
+        etiquetaUsuarioId.textContent = `ID: ${usuario.id ?? 'N/D'}`;
+    }
 
     const listaTickets = document.getElementById('lista-tickets');
     const detalleTicket = document.getElementById('detalle-ticket');
     const listaUsuarios = document.getElementById('lista-usuarios');
+    const formularioCrearUsuario = document.getElementById('form-crear-usuario');
+    const btnToggleFormUsuario = document.getElementById('btn-toggle-form-usuario');
     const filtrosTickets = document.getElementById('filtros-tickets');
 
     let todosLosUsuarios = [];
+    let cacheTickets = [];
+
+    function obtenerUsuarioPorId(id) {
+        if (!id) return null;
+        return todosLosUsuarios.find(user => Number(user.id) === Number(id));
+    }
+
+    function obtenerDatosCreador(ticket) {
+        const usuarioGestor = obtenerUsuarioPorId(ticket.gestor_id);
+        return {
+            nombre: usuarioGestor?.name || `Gestor #${ticket.gestor_id || 'N/D'}`,
+            correo: usuarioGestor?.email || 'Correo no disponible'
+        };
+    }
+
+    if (detalleTicket) {
+        detalleTicket.innerHTML = '';
+    }
 
     // Cargar datos al iniciar
     cargarTickets();
     cargarUsuarios();
     crearFiltros();
+    renderFormularioCrearUsuario();
+    configurarToggleFormulario();
 
     // Crear interfaz de filtros
     function crearFiltros() {
         const html = `
             <div class="filtros-contenedor">
-                <h3>Filtros</h3>
+                <h3>Filtros y Búsqueda</h3>
+                <div class="filtro-grupo">
+                    <label for="buscar-ticket">Buscar (título o descripción):</label>
+                    <input type="text" id="buscar-ticket" placeholder="Escribe para buscar...">
+                </div>
                 <div class="filtro-grupo">
                     <label for="filtro-estado">Estado:</label>
                     <select id="filtro-estado">
@@ -39,7 +80,7 @@
                     </select>
                 </div>
                 <div class="filtro-grupo">
-                    <label for="filtro-gestor">Gestor:</label>
+                    <label for="filtro-gestor">Gestor (creador):</label>
                     <select id="filtro-gestor">
                         <option value="">Todos</option>
                     </select>
@@ -61,6 +102,16 @@
         // Event listeners para filtros
         document.getElementById('btn-aplicar-filtros').addEventListener('click', aplicarFiltros);
         document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
+        
+        // Búsqueda en tiempo real (cuando se presiona Enter)
+        const buscarInput = document.getElementById('buscar-ticket');
+        if (buscarInput) {
+            buscarInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    aplicarFiltros();
+                }
+            });
+        }
 
         // Llenar selectores con usuarios
         cargarUsuariosEnFiltros();
@@ -70,6 +121,16 @@
     function cargarUsuariosEnFiltros() {
         const selectGestor = document.getElementById('filtro-gestor');
         const selectAdmin = document.getElementById('filtro-admin');
+
+        if (!selectGestor || !selectAdmin) {
+            return;
+        }
+
+        selectGestor.innerHTML = '<option value="">Todos</option>';
+        selectAdmin.innerHTML = `
+            <option value="">Todos</option>
+            <option value="sin_asignar">Sin asignar</option>
+        `;
 
         if (todosLosUsuarios.length > 0) {
             todosLosUsuarios.forEach(user => {
@@ -91,11 +152,13 @@
 
     // Aplicar filtros
     function aplicarFiltros() {
+        const buscar = document.getElementById('buscar-ticket').value.trim();
         const estado = document.getElementById('filtro-estado').value;
         const gestorId = document.getElementById('filtro-gestor').value;
         const adminId = document.getElementById('filtro-admin').value;
 
         const params = {};
+        if (buscar) params.buscar = buscar;
         if (estado) params.estado = estado;
         if (gestorId) params.gestor_id = gestorId;
         if (adminId && adminId !== 'sin_asignar') {
@@ -110,6 +173,7 @@
 
     // Limpiar filtros
     function limpiarFiltros() {
+        document.getElementById('buscar-ticket').value = '';
         document.getElementById('filtro-estado').value = '';
         document.getElementById('filtro-gestor').value = '';
         document.getElementById('filtro-admin').value = '';
@@ -134,6 +198,9 @@
 
     // Mostrar lista de tickets
     function mostrarTickets(tickets) {
+        if (!listaTickets) return;
+        cacheTickets = Array.isArray(tickets) ? tickets : [];
+
         if (tickets.length === 0) {
             listaTickets.innerHTML = '<p>No hay tickets que coincidan con los filtros</p>';
             return;
@@ -142,6 +209,10 @@
         const html = tickets.map(ticket => {
             const estadoClass = `estado-${ticket.estado}`;
             const fecha = new Date(ticket.created_at).toLocaleDateString('es-ES');
+            const descripcionCorta = ticket.descripcion
+                ? `${ticket.descripcion.substring(0, 120)}${ticket.descripcion.length > 120 ? '...' : ''}`
+                : '';
+            const datosCreador = obtenerDatosCreador(ticket);
             
             return `
                 <div class="ticket-item" data-id="${ticket.id}">
@@ -150,44 +221,107 @@
                         <span class="estado ${estadoClass}">${ticket.estado}</span>
                         <span class="fecha">${fecha}</span>
                     </p>
-                    <p class="ticket-descripcion">${ticket.descripcion.substring(0, 100)}${ticket.descripcion.length > 100 ? '...' : ''}</p>
+                    <p class="ticket-creador">Creado por: ${datosCreador.nombre} (${datosCreador.correo})</p>
+                    <p class="ticket-descripcion">${descripcionCorta}</p>
                     <button class="btn-ver-detalle" data-id="${ticket.id}">Ver detalles</button>
+                    <div class="ticket-detalle-expandido" id="detalle-ticket-${ticket.id}"></div>
                 </div>
             `;
         }).join('');
 
         listaTickets.innerHTML = html;
 
-        // Agregar event listeners
-        document.querySelectorAll('.btn-ver-detalle').forEach(btn => {
+        listaTickets.querySelectorAll('.btn-ver-detalle').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const ticketId = e.target.getAttribute('data-id');
-                verDetalleTicket(ticketId);
+                const ticketId = e.currentTarget.getAttribute('data-id');
+                toggleDetalleTicket(ticketId, e.currentTarget);
             });
         });
     }
 
-    // Ver detalle de un ticket
-    async function verDetalleTicket(ticketId) {
+    async function toggleDetalleTicket(ticketId, triggerBtn) {
+        const contenedorDetalle = document.getElementById(`detalle-ticket-${ticketId}`);
+        const tarjeta = document.querySelector(`.ticket-item[data-id="${ticketId}"]`);
+
+        if (!contenedorDetalle || !tarjeta) {
+            return;
+        }
+
+        const yaVisible = contenedorDetalle.classList.contains('visible');
+
+        if (yaVisible) {
+            cerrarDetalleExpandido(contenedorDetalle, tarjeta, triggerBtn);
+            return;
+        }
+
+        cerrarOtrosDetalles(ticketId);
+        ocultarOtrosTickets(tarjeta);
+
+        contenedorDetalle.classList.add('visible');
+        tarjeta.classList.add('abierto');
+        contenedorDetalle.innerHTML = '<p class="mensaje info">Cargando detalle...</p>';
+        if (triggerBtn) {
+            triggerBtn.textContent = 'Ocultar detalles';
+        }
+
         try {
             const resultado = await apiObtenerTicket(ticketId);
 
             if (resultado.success && resultado.data) {
-                mostrarDetalleTicket(resultado.data);
+                renderDetalleTicket(resultado.data, contenedorDetalle, triggerBtn);
             } else {
-                detalleTicket.innerHTML = '<p class="error">Error al cargar el ticket</p>';
+                contenedorDetalle.innerHTML = '<p class="mensaje error">No se pudo cargar el ticket</p>';
             }
         } catch (error) {
             console.error('Error al cargar detalle:', error);
-            detalleTicket.innerHTML = '<p class="error">Error al conectar con el servidor</p>';
+            contenedorDetalle.innerHTML = '<p class="mensaje error">Error al conectar con el servidor</p>';
         }
     }
 
-    // Mostrar detalle del ticket con controles de admin
-    function mostrarDetalleTicket(ticket) {
+    function cerrarOtrosDetalles(ticketIdActivo) {
+        document.querySelectorAll('.ticket-detalle-expandido.visible').forEach(detalle => {
+            if (detalle.id !== `detalle-ticket-${ticketIdActivo}`) {
+                const tarjeta = detalle.closest('.ticket-item');
+                const boton = tarjeta ? tarjeta.querySelector('.btn-ver-detalle') : null;
+                cerrarDetalleExpandido(detalle, tarjeta, boton);
+            }
+        });
+    }
+
+    function ocultarOtrosTickets(tarjetaSeleccionada) {
+        document.querySelectorAll('.ticket-item').forEach(item => {
+            if (item !== tarjetaSeleccionada) {
+                item.classList.add('oculto');
+            }
+        });
+    }
+
+    function mostrarTodosLosTickets() {
+        document.querySelectorAll('.ticket-item').forEach(item => item.classList.remove('oculto', 'abierto'));
+        listaTickets.querySelectorAll('.ticket-detalle-expandido').forEach(detalle => {
+            detalle.classList.remove('visible');
+            detalle.innerHTML = '';
+        });
+        listaTickets.querySelectorAll('.btn-ver-detalle').forEach(btn => (btn.textContent = 'Ver detalles'));
+    }
+
+    function cerrarDetalleExpandido(contenedorDetalle, tarjeta, triggerBtn) {
+        contenedorDetalle.classList.remove('visible');
+        contenedorDetalle.innerHTML = '';
+        if (tarjeta) {
+            tarjeta.classList.remove('abierto');
+        }
+        if (triggerBtn) {
+            triggerBtn.textContent = 'Ver detalles';
+        }
+        mostrarTodosLosTickets();
+    }
+
+    function renderDetalleTicket(ticket, contenedorDetalle, triggerBtn = null) {
         const estadoClass = `estado-${ticket.estado}`;
         const fechaCreacion = new Date(ticket.created_at).toLocaleString('es-ES');
         const fechaActualizacion = new Date(ticket.updated_at).toLocaleString('es-ES');
+        const datosCreador = obtenerDatosCreador(ticket);
 
         let actividadesHtml = '';
         if (ticket.actividades && ticket.actividades.length > 0) {
@@ -207,42 +341,46 @@
         // Opciones de administradores para asignar
         const adminsOptions = todosLosUsuarios
             .filter(u => u.role === 'admin')
-            .map(admin => `<option value="${admin.id}">${admin.name}</option>`)
+            .map(admin => {
+                const seleccionado = Number(ticket.admin_id) === Number(admin.id) ? 'selected' : '';
+                return `<option value="${admin.id}" ${seleccionado}>${admin.name}</option>`;
+            })
             .join('');
 
         const html = `
-            <div class="detalle-ticket-contenido">
+            <div class="detalle-ticket-contenido detalle-ticket-inline">
                 <h3>${ticket.titulo}</h3>
                 <div class="ticket-info">
                     <p><strong>Estado:</strong> <span class="estado ${estadoClass}">${ticket.estado}</span></p>
                     <p><strong>Creado:</strong> ${fechaCreacion}</p>
                     <p><strong>Última actualización:</strong> ${fechaActualizacion}</p>
-                </div>
-                <div class="ticket-descripcion-completa">
-                    <h4>Descripción:</h4>
-                    <p>${ticket.descripcion}</p>
+                    <p><strong>Gestor:</strong> ${datosCreador.nombre} (${datosCreador.correo})</p>
                 </div>
                 <div class="admin-controls">
                     <h4>Gestión:</h4>
                     <div class="control-grupo">
-                        <label for="cambiar-estado">Cambiar estado:</label>
-                        <select id="cambiar-estado">
+                        <label>Cambiar estado:</label>
+                        <select class="select-cambiar-estado">
                             <option value="abierto" ${ticket.estado === 'abierto' ? 'selected' : ''}>Abierto</option>
                             <option value="en_progreso" ${ticket.estado === 'en_progreso' ? 'selected' : ''}>En Progreso</option>
                             <option value="resuelto" ${ticket.estado === 'resuelto' ? 'selected' : ''}>Resuelto</option>
                             <option value="cerrado" ${ticket.estado === 'cerrado' ? 'selected' : ''}>Cerrado</option>
                         </select>
-                        <button id="btn-actualizar-estado" class="btn-primario" data-ticket-id="${ticket.id}">Actualizar estado</button>
+                        <button class="btn-primario btn-actualizar-estado">Actualizar estado</button>
                     </div>
                     <div class="control-grupo">
-                        <label for="asignar-admin">Asignar a:</label>
-                        <select id="asignar-admin">
-                            <option value="">Sin asignar</option>
+                        <label>Asignar a:</label>
+                        <select class="select-asignar-admin">
+                            <option value="" ${ticket.admin_id ? '' : 'selected'}>Sin asignar</option>
                             ${adminsOptions}
                         </select>
-                        <button id="btn-asignar" class="btn-primario" data-ticket-id="${ticket.id}">Asignar</button>
+                        <button class="btn-primario btn-asignar">Asignar</button>
                     </div>
-                    <p id="mensaje-gestion" class="mensaje"></p>
+                    <p class="mensaje mensaje-gestion" style="display:none;"></p>
+                </div>
+                <div class="ticket-descripcion-completa">
+                    <h4>Descripción:</h4>
+                    <p>${ticket.descripcion || 'Sin descripción registrada'}</p>
                 </div>
                 <div class="ticket-actividades">
                     <h4>Comentarios:</h4>
@@ -250,98 +388,261 @@
                 </div>
                 <div class="agregar-comentario">
                     <h4>Agregar comentario:</h4>
-                    <textarea id="nuevo-comentario" rows="3" placeholder="Escribe tu comentario..."></textarea>
-                    <button id="btn-agregar-comentario" class="btn-primario" data-ticket-id="${ticket.id}">Agregar comentario</button>
-                    <p id="mensaje-comentario" class="mensaje"></p>
+                    <textarea class="textarea-comentario" rows="3" placeholder="Escribe tu comentario..."></textarea>
+                    <button class="btn-primario btn-agregar-comentario">Agregar comentario</button>
+                    <p class="mensaje mensaje-comentario" style="display:none;"></p>
                 </div>
+                <button class="btn-cerrar-detalle btn-primario">Cerrar vista de detalles</button>
             </div>
         `;
 
-        detalleTicket.innerHTML = html;
+        contenedorDetalle.innerHTML = html;
 
-        // Event listeners para controles de admin
-        document.getElementById('btn-actualizar-estado').addEventListener('click', async () => {
-            const nuevoEstado = document.getElementById('cambiar-estado').value;
-            const mensajeGestion = document.getElementById('mensaje-gestion');
+        const selectEstado = contenedorDetalle.querySelector('.select-cambiar-estado');
+        const btnActualizarEstado = contenedorDetalle.querySelector('.btn-actualizar-estado');
+        const selectAsignar = contenedorDetalle.querySelector('.select-asignar-admin');
+        const btnAsignar = contenedorDetalle.querySelector('.btn-asignar');
+        const mensajeGestion = contenedorDetalle.querySelector('.mensaje-gestion');
+        const textareaComentario = contenedorDetalle.querySelector('.textarea-comentario');
+        const btnAgregarComentario = contenedorDetalle.querySelector('.btn-agregar-comentario');
+        const mensajeComentario = contenedorDetalle.querySelector('.mensaje-comentario');
+        const btnCerrarDetalle = contenedorDetalle.querySelector('.btn-cerrar-detalle');
+        const tarjeta = contenedorDetalle.closest('.ticket-item');
 
-            try {
-                const resultado = await apiActualizarEstadoTicket(ticket.id, nuevoEstado, usuario.id);
 
-                if (resultado.success) {
-                    mensajeGestion.textContent = 'Estado actualizado exitosamente';
-                    mensajeGestion.className = 'mensaje exito';
-                    verDetalleTicket(ticket.id);
-                    cargarTickets();
-                } else {
-                    mensajeGestion.textContent = resultado.message || 'Error al actualizar estado';
-                    mensajeGestion.className = 'mensaje error';
+        if (mensajeGestion) {
+            mensajeGestion.textContent = '';
+            mensajeGestion.style.display = 'none';
+        }
+
+        if (mensajeComentario) {
+            mensajeComentario.textContent = '';
+            mensajeComentario.style.display = 'none';
+        }
+
+        if (btnActualizarEstado && selectEstado) {
+            btnActualizarEstado.addEventListener('click', async () => {
+                try {
+                    const resultado = await apiActualizarEstadoTicket(ticket.id, selectEstado.value, usuario.id);
+
+                    if (resultado.success) {
+                        mostrarMensaje(mensajeGestion, 'Estado actualizado exitosamente', true);
+                        await refrescarDetalleTicket(ticket.id, contenedorDetalle);
+                        cargarTickets();
+                    } else {
+                        mostrarMensaje(mensajeGestion, resultado.message || 'Error al actualizar estado', false);
+                    }
+                } catch (error) {
+                    console.error('Error al actualizar estado:', error);
+                    mostrarMensaje(mensajeGestion, 'Error al conectar con el servidor', false);
                 }
-            } catch (error) {
-                console.error('Error al actualizar estado:', error);
-                mensajeGestion.textContent = 'Error al conectar con el servidor';
-                mensajeGestion.className = 'mensaje error';
+            });
+        }
+
+        if (btnAsignar && selectAsignar) {
+            btnAsignar.addEventListener('click', async () => {
+                const adminId = selectAsignar.value;
+
+                if (!adminId) {
+                    mostrarMensaje(mensajeGestion, 'Selecciona un administrador', false);
+                    return;
+                }
+
+                const adminOption = selectAsignar.options[selectAsignar.selectedIndex];
+                const adminNombre = adminOption ? adminOption.textContent : '';
+
+                try {
+                    const resultado = await apiAsignarTicket(ticket.id, adminId, usuario.id, adminNombre);
+
+                    if (resultado.success) {
+                        mostrarMensaje(mensajeGestion, 'Ticket asignado exitosamente', true);
+                        await refrescarDetalleTicket(ticket.id, contenedorDetalle);
+                        cargarTickets();
+                    } else {
+                        mostrarMensaje(mensajeGestion, resultado.message || 'Error al asignar ticket', false);
+                    }
+                } catch (error) {
+                    console.error('Error al asignar ticket:', error);
+                    mostrarMensaje(mensajeGestion, 'Error al conectar con el servidor', false);
+                }
+            });
+        }
+
+        if (btnAgregarComentario && textareaComentario) {
+            btnAgregarComentario.addEventListener('click', async () => {
+                const mensaje = textareaComentario.value.trim();
+
+                if (!mensaje) {
+                    mostrarMensaje(mensajeComentario, 'El comentario no puede estar vacío', false);
+                    return;
+                }
+
+                try {
+                    const resultado = await apiAgregarComentario(ticket.id, mensaje, usuario.id);
+
+                    if (resultado.success) {
+                        mostrarMensaje(mensajeComentario, 'Comentario agregado exitosamente', true);
+                        textareaComentario.value = '';
+                        await refrescarDetalleTicket(ticket.id, contenedorDetalle);
+                    } else {
+                        mostrarMensaje(mensajeComentario, resultado.message || 'Error al agregar comentario', false);
+                    }
+                } catch (error) {
+                    console.error('Error al agregar comentario:', error);
+                    mostrarMensaje(mensajeComentario, 'Error al conectar con el servidor', false);
+                }
+            });
+        }
+
+        if (btnCerrarDetalle) {
+            btnCerrarDetalle.addEventListener('click', () => {
+                cerrarDetalleExpandido(contenedorDetalle, tarjeta, triggerBtn || (tarjeta ? tarjeta.querySelector('.btn-ver-detalle') : null));
+            });
+        }
+    }
+
+    async function refrescarDetalleTicket(ticketId, contenedorDetalle) {
+        if (!contenedorDetalle) return;
+
+        contenedorDetalle.innerHTML = '<p class="mensaje info">Actualizando información...</p>';
+
+        try {
+            const resultado = await apiObtenerTicket(ticketId);
+
+            if (resultado.success && resultado.data) {
+                renderDetalleTicket(resultado.data, contenedorDetalle);
+            } else {
+                contenedorDetalle.innerHTML = '<p class="mensaje error">No se pudo actualizar el detalle</p>';
             }
-        });
+        } catch (error) {
+            console.error('Error al refrescar detalle:', error);
+            contenedorDetalle.innerHTML = '<p class="mensaje error">Error al conectar con el servidor</p>';
+        }
+    }
 
-        document.getElementById('btn-asignar').addEventListener('click', async () => {
-            const adminId = document.getElementById('asignar-admin').value;
-            const mensajeGestion = document.getElementById('mensaje-gestion');
+    function mostrarMensaje(elemento, texto, esExito = true) {
+        if (!elemento) return;
 
-            if (!adminId) {
-                mensajeGestion.textContent = 'Selecciona un administrador';
-                mensajeGestion.className = 'mensaje error';
+        elemento.textContent = texto;
+        elemento.style.display = 'block';
+        elemento.className = `mensaje ${esExito ? 'exito' : 'error'}`;
+    }
+
+    // Renderizar formulario de creación de usuarios
+    function renderFormularioCrearUsuario() {
+        if (!formularioCrearUsuario) return;
+
+        formularioCrearUsuario.innerHTML = `
+            <div class="formulario-crear-usuario">
+                <h3>Crear nuevo usuario</h3>
+                <form id="form-nuevo-usuario">
+                    <div class="campo-form">
+                        <label for="nuevo-nombre">Nombre completo:</label>
+                        <input type="text" id="nuevo-nombre" placeholder="Ej. Juan Pérez" required>
+                    </div>
+                    <div class="campo-form">
+                        <label for="nuevo-email">Correo electrónico:</label>
+                        <input type="email" id="nuevo-email" placeholder="usuario@ejemplo.com" required>
+                    </div>
+                    <div class="campo-form">
+                        <label for="nuevo-password">Contraseña temporal:</label>
+                        <input type="password" id="nuevo-password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    <div class="campo-form">
+                        <label for="nuevo-role">Rol:</label>
+                        <select id="nuevo-role" required>
+                            <option value="gestor">Gestor</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="acciones-form">
+                        <button type="submit" class="btn-primario">Crear usuario</button>
+                        <button type="reset" class="btn-secundario">Limpiar</button>
+                        <button type="button" class="btn-cerrar-form">Cancelar</button>
+                    </div>
+                    <p id="mensaje-crear-usuario" class="mensaje"></p>
+                </form>
+            </div>
+        `;
+
+        const form = document.getElementById('form-nuevo-usuario');
+        const mensajeCrear = document.getElementById('mensaje-crear-usuario');
+
+        if (mensajeCrear) {
+            mensajeCrear.textContent = '';
+            mensajeCrear.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const datos = {
+                name: document.getElementById('nuevo-nombre').value.trim(),
+                email: document.getElementById('nuevo-email').value.trim(),
+                password: document.getElementById('nuevo-password').value.trim(),
+                role: document.getElementById('nuevo-role').value
+            };
+
+            if (!datos.name || !datos.email || !datos.password) {
+                mostrarMensaje(mensajeCrear, 'Todos los campos son obligatorios', false);
+                return;
+            }
+
+            if (datos.password.length < 6) {
+                mostrarMensaje(mensajeCrear, 'La contraseña debe tener al menos 6 caracteres', false);
                 return;
             }
 
             try {
-                const resultado = await apiAsignarTicket(ticket.id, adminId, usuario.id);
+                const resultado = await apiCrearUsuario(datos);
 
                 if (resultado.success) {
-                    mensajeGestion.textContent = 'Ticket asignado exitosamente';
-                    mensajeGestion.className = 'mensaje exito';
-                    verDetalleTicket(ticket.id);
-                    cargarTickets();
+                    mostrarMensaje(mensajeCrear, 'Usuario creado exitosamente', true);
+                    form.reset();
+                    cargarUsuarios();
                 } else {
-                    mensajeGestion.textContent = resultado.message || 'Error al asignar ticket';
-                    mensajeGestion.className = 'mensaje error';
+                    mostrarMensaje(mensajeCrear, resultado.message || 'No se pudo crear el usuario', false);
                 }
             } catch (error) {
-                console.error('Error al asignar ticket:', error);
-                mensajeGestion.textContent = 'Error al conectar con el servidor';
-                mensajeGestion.className = 'mensaje error';
+                console.error('Error al crear usuario:', error);
+                mostrarMensaje(mensajeCrear, 'Error al conectar con el servidor', false);
             }
         });
 
-        // Event listener para comentarios
-        document.getElementById('btn-agregar-comentario').addEventListener('click', async () => {
-            const mensaje = document.getElementById('nuevo-comentario').value.trim();
-            const mensajeComentario = document.getElementById('mensaje-comentario');
+        const btnCerrarForm = form.querySelector('.btn-cerrar-form');
+        if (btnCerrarForm) {
+            btnCerrarForm.addEventListener('click', () => {
+                form.reset();
+                ocultarFormularioCrearUsuario();
+            });
+        }
+    }
 
-            if (!mensaje) {
-                mensajeComentario.textContent = 'El comentario no puede estar vacío';
-                mensajeComentario.className = 'mensaje error';
-                return;
-            }
+    function configurarToggleFormulario() {
+        if (!btnToggleFormUsuario || !formularioCrearUsuario) return;
 
-            try {
-                const resultado = await apiAgregarComentario(ticket.id, mensaje, usuario.id);
-
-                if (resultado.success) {
-                    mensajeComentario.textContent = 'Comentario agregado exitosamente';
-                    mensajeComentario.className = 'mensaje exito';
-                    document.getElementById('nuevo-comentario').value = '';
-                    verDetalleTicket(ticket.id);
-                    cargarTickets();
-                } else {
-                    mensajeComentario.textContent = resultado.message || 'Error al agregar comentario';
-                    mensajeComentario.className = 'mensaje error';
-                }
-            } catch (error) {
-                console.error('Error al agregar comentario:', error);
-                mensajeComentario.textContent = 'Error al conectar con el servidor';
-                mensajeComentario.className = 'mensaje error';
+        btnToggleFormUsuario.addEventListener('click', () => {
+            const visible = !formularioCrearUsuario.classList.contains('oculto');
+            if (visible) {
+                ocultarFormularioCrearUsuario();
+            } else {
+                mostrarFormularioCrearUsuario();
             }
         });
+
+        ocultarFormularioCrearUsuario();
+    }
+
+    function mostrarFormularioCrearUsuario() {
+        if (!formularioCrearUsuario || !btnToggleFormUsuario) return;
+        formularioCrearUsuario.classList.remove('oculto');
+        btnToggleFormUsuario.textContent = 'Cerrar formulario';
+    }
+
+    function ocultarFormularioCrearUsuario() {
+        if (!formularioCrearUsuario || !btnToggleFormUsuario) return;
+        formularioCrearUsuario.classList.add('oculto');
+        btnToggleFormUsuario.textContent = 'Crear usuario';
     }
 
     // Cargar usuarios
@@ -352,6 +653,10 @@
             if (resultado.success && resultado.data) {
                 todosLosUsuarios = resultado.data;
                 mostrarUsuarios(resultado.data);
+                cargarUsuariosEnFiltros();
+                if (cacheTickets.length > 0) {
+                    mostrarTickets(cacheTickets);
+                }
             } else {
                 listaUsuarios.innerHTML = '<p>No hay usuarios disponibles</p>';
             }

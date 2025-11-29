@@ -39,6 +39,7 @@ return function ($app) {
         $group->group('/usuarios', function (RouteCollectorProxy $userGroup) {
             
             // Solo administradores pueden gestionar usuarios
+            $userGroup->post('', [UserController::class, 'crear'])->add(AdminMiddleware::class);
             $userGroup->get('', [UserController::class, 'listar'])->add(AdminMiddleware::class);
             $userGroup->get('/{id:[0-9]+}', [UserController::class, 'obtener'])->add(AdminMiddleware::class);
             $userGroup->put('/{id:[0-9]+}', [UserController::class, 'actualizar'])->add(AdminMiddleware::class);

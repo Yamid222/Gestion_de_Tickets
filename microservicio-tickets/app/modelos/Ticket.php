@@ -103,16 +103,17 @@ class Ticket extends Model
     /**
      * Asignar ticket a un administrador
      */
-    public function asignarAdmin($adminId, $userId)
+    public function asignarAdmin($adminId, $userId, $adminNombre = null)
     {
         $this->admin_id = $adminId;
         $this->save();
 
         // Registrar actividad
+        $nombreMostrar = $adminNombre ? $adminNombre : "ID: {$adminId}";
         TicketActividad::create([
             'ticket_id' => $this->id,
             'user_id' => $userId,
-            'mensaje' => "Ticket asignado al administrador ID: {$adminId}"
+            'mensaje' => "Ticket asignado al administrador {$nombreMostrar}"
         ]);
 
         return $this;

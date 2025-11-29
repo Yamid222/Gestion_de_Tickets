@@ -36,6 +36,88 @@ class UserController
     }
 
     /**
+     * Crear un nuevo usuario
+     */
+    public function crear(Request $request, Response $response)
+    {
+        try {
+            $data = json_decode($request->getBody()->getContents(), true) ?? [];
+
+            $camposRequeridos = ['name', 'email', 'password', 'role'];
+            foreach ($camposRequeridos as $campo) {
+                if (empty($data[$campo])) {
+                    $response->getBody()->write(json_encode([
+                        'success' => false,
+                        'message' => "El campo {$campo} es obligatorio"
+                    ]));
+                    return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+                }
+            }
+
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El email no es válido'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            if (strlen($data['password']) < 6) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'La contraseña debe tener al menos 6 caracteres'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            if (!in_array($data['role'], ['gestor', 'admin'])) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'Rol no válido'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            if (User::where('email', $data['email'])->exists()) {
+                $response->getBody()->write(json_encode([
+                    'success' => false,
+                    'message' => 'El email ya está registrado'
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+            }
+
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'role' => $data['role']
+            ]);
+
+            $response->getBody()->write(json_encode([
+                'success' => true,
+                'message' => 'Usuario creado exitosamente',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'created_at' => $user->created_at
+                ]
+            ]));
+
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Error interno del servidor',
+                'error' => $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    }
+
+    /**
      * Obtener usuario por ID
      */
     public function obtener(Request $request, Response $response, array $args)

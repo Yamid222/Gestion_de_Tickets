@@ -11,7 +11,12 @@
 </head>
 <body>
     <header class="encabezado">
-        <h1>Panel de Administrador</h1>
+        <div class="encabezado-info">
+            <h1>Panel de Administrador</h1>
+            <p id="usuario-nombre" class="usuario-actual"></p>
+            <p id="usuario-correo" class="usuario-actual correo"></p>
+            <p id="usuario-id" class="usuario-actual id"></p>
+        </div>
         <button id="btn-logout" class="btn-secundario">Cerrar sesión</button>
     </header>
 
@@ -23,11 +28,14 @@
         </section>
 
         <section class="panel-derecho">
-            <h2>Detalle del ticket</h2>
             <div id="detalle-ticket" class="detalle-ticket"></div>
 
-            <h2>Gestión de usuarios (estructura)</h2>
-            <div id="lista-usuarios" class="lista-usuarios"></div>
+            <h2>Gestión de usuarios</h2>
+            <div class="seccion-usuarios">
+                <button id="btn-toggle-form-usuario" class="btn-primario btn-toggle-form">Crear usuario</button>
+                <div id="form-crear-usuario" class="formulario-usuarios oculto"></div>
+                <div id="lista-usuarios" class="lista-usuarios"></div>
+            </div>
         </section>
     </main>
 
