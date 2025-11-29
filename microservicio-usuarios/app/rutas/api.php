@@ -8,10 +8,8 @@ use App\Middleware\AdminMiddleware;
 
 return function ($app) {
     
-    // Grupo de rutas API con prefijo /api
     $app->group('/api', function (RouteCollectorProxy $group) {
         
-        // Rutas de autenticación (no requieren token)
         $group->group('/auth', function (RouteCollectorProxy $authGroup) {
             
             $authGroup->post('/registro', function ($request, $response, $args) {
@@ -35,10 +33,8 @@ return function ($app) {
             });
         });
 
-        // Rutas de usuarios (requieren autenticación)
         $group->group('/usuarios', function (RouteCollectorProxy $userGroup) {
             
-            // Solo administradores pueden gestionar usuarios
             $userGroup->post('', [UserController::class, 'crear'])->add(AdminMiddleware::class);
             $userGroup->get('', [UserController::class, 'listar'])->add(AdminMiddleware::class);
             $userGroup->get('/{id:[0-9]+}', [UserController::class, 'obtener'])->add(AdminMiddleware::class);
@@ -49,7 +45,6 @@ return function ($app) {
 
     });
 
-    // Ruta de prueba
     $app->get('/', function ($request, $response) {
         $response->getBody()->write(json_encode([
             'service' => 'Microservicio de Usuarios',
@@ -59,7 +54,6 @@ return function ($app) {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
-    // Manejo de rutas no encontradas
     $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
         $response->getBody()->write(json_encode([
             'success' => false,

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Script para hashear las contraseñas de usuarios existentes en la base de datos
- * Ejecutar este script una vez después de insertar usuarios con contraseñas en texto plano
- */
-
 require 'microservicio-usuarios/vendor/autoload.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -27,23 +22,19 @@ try {
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
-    // Obtener todos los usuarios
     $users = Capsule::table('users')->get();
     
     echo "🔐 Hasheando contraseñas de usuarios...\n\n";
     
     $updated = 0;
     foreach ($users as $user) {
-        // Verificar si la contraseña ya está hasheada (las contraseñas hasheadas tienen 60 caracteres)
         if (strlen($user->password) < 60) {
-            // Hashear la contraseña
             $hashedPassword = password_hash($user->password, PASSWORD_DEFAULT);
-            
-            // Actualizar en la base de datos
+
             Capsule::table('users')
                 ->where('id', $user->id)
                 ->update(['password' => $hashedPassword]);
-            
+
             echo "✅ Usuario '{$user->name}' (ID: {$user->id}) - Contraseña hasheada\n";
             $updated++;
         } else {

@@ -1,6 +1,3 @@
-// Script para el panel de gestor
-// Maneja: crear tickets, listar tickets propios, ver detalles, agregar comentarios
-
 (function() {
     let usuario = null;
     const etiquetaUsuarioNombre = document.getElementById('usuario-nombre');
@@ -11,18 +8,15 @@
     const listaTickets = document.getElementById('lista-tickets');
     const detalleTicket = document.getElementById('detalle-ticket');
 
-    // Inicializar panel cuando el DOM esté listo
     function iniciarPanel() {
         usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
         
-        // Verificar que el usuario tenga datos
         if (!usuario.id || !usuario.role) {
             console.error('Usuario no encontrado en localStorage:', usuario);
             window.location.href = 'index.html';
             return;
         }
         
-        // Verificar que sea gestor
         if (usuario.role !== 'gestor') {
             console.error('Usuario no es gestor:', usuario.role);
             window.location.href = 'index.html';
@@ -43,10 +37,8 @@
             etiquetaUsuarioId.textContent = `ID: ${usuario.id ?? 'N/D'}`;
         }
 
-        // Cargar tickets al iniciar
         cargarTickets();
 
-        // Manejar creación de ticket
         if (formCrearTicket) {
             formCrearTicket.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -62,7 +54,6 @@
                     return;
                 }
 
-                // Verificar que el usuario tenga ID
                 if (!usuario || !usuario.id) {
                     mensajeTicket.textContent = 'Error: No se pudo obtener el ID del usuario. Por favor, inicia sesión nuevamente.';
                     mensajeTicket.className = 'mensaje error';
@@ -100,7 +91,6 @@
         }
     }
 
-    // Cargar tickets del gestor
     async function cargarTickets() {
         if (!usuario || !usuario.id) {
             console.error('No se puede cargar tickets: usuario no disponible');
@@ -124,7 +114,6 @@
         }
     }
 
-    // Mostrar lista de tickets
     function mostrarTickets(tickets) {
         if (tickets.length === 0) {
             listaTickets.innerHTML = '<p>No tienes tickets creados</p>';
@@ -155,7 +144,6 @@
 
         listaTickets.innerHTML = html;
 
-        // Agregar event listeners a los botones
         document.querySelectorAll('.btn-ver-detalle').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const ticketId = e.target.getAttribute('data-id');
@@ -164,7 +152,6 @@
         });
     }
 
-    // Ver detalle de un ticket
     async function verDetalleTicket(ticketId) {
         try {
             const resultado = await apiObtenerTicket(ticketId);
@@ -180,7 +167,6 @@
         }
     }
 
-    // Mostrar detalle del ticket
     function mostrarDetalleTicket(ticket) {
         const estadoClass = `estado-${ticket.estado}`;
         const fechaCreacion = new Date(ticket.created_at).toLocaleString('es-ES');
@@ -231,7 +217,6 @@
 
         detalleTicket.innerHTML = html;
 
-        // Agregar event listener al botón de comentario
         const btnComentario = document.getElementById('btn-agregar-comentario');
         if (btnComentario) {
             btnComentario.addEventListener('click', async () => {
@@ -257,9 +242,7 @@
                         mensajeComentario.textContent = 'Comentario agregado exitosamente';
                         mensajeComentario.className = 'mensaje exito';
                         document.getElementById('nuevo-comentario').value = '';
-                        // Recargar el detalle para mostrar el nuevo comentario
                         verDetalleTicket(ticket.id);
-                        // Recargar la lista
                         cargarTickets();
                     } else {
                         mensajeComentario.textContent = resultado.message || 'Error al agregar comentario';
@@ -274,7 +257,6 @@
         }
     }
 
-    // Inicializar cuando el DOM esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', iniciarPanel);
     } else {

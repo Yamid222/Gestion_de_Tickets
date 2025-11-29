@@ -9,15 +9,11 @@ use App\Models\TicketActividad;
 
 class TicketController
 {
-    /**
-     * Crear nuevo ticket (solo gestores)
-     */
     public function crear(Request $request, Response $response, array $args = [])
     {
         try {
             $data = json_decode($request->getBody()->getContents(), true);
 
-            // Validaciones básicas
             if (empty($data['titulo']) || empty($data['descripcion']) || empty($data['gestor_id'])) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -26,7 +22,6 @@ class TicketController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Crear el ticket
             $ticket = Ticket::create([
                 'titulo' => $data['titulo'],
                 'descripcion' => $data['descripcion'],
@@ -34,14 +29,12 @@ class TicketController
                 'gestor_id' => $data['gestor_id']
             ]);
 
-            // Registrar actividad inicial
             TicketActividad::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => $data['gestor_id'],
                 'mensaje' => 'Ticket creado: ' . $data['titulo']
             ]);
 
-            // Cargar actividades para la respuesta
             $ticket->load('actividades');
 
             $response->getBody()->write(json_encode([
@@ -62,9 +55,6 @@ class TicketController
         }
     }
 
-    /**
-     * Listar tickets con filtros opcionales
-     */
     public function listar(Request $request, Response $response, array $args = [])
     {
         try {
@@ -72,7 +62,6 @@ class TicketController
             
             $query = Ticket::with('actividades');
 
-            // Filtros opcionales
             if (!empty($queryParams['estado'])) {
                 $query->where('estado', $queryParams['estado']);
             }
@@ -85,17 +74,14 @@ class TicketController
                 $query->where('admin_id', $queryParams['admin_id']);
             }
 
-            // Tickets sin asignar (admin_id es NULL)
             if (!empty($queryParams['sin_asignar'])) {
                 $query->whereNull('admin_id');
             }
 
-            // Solo tickets del gestor si se especifica
             if (!empty($queryParams['solo_gestor']) && !empty($queryParams['user_id'])) {
                 $query->where('gestor_id', $queryParams['user_id']);
             }
 
-            // Búsqueda por texto (título o descripción)
             if (!empty($queryParams['buscar'])) {
                 $buscar = $queryParams['buscar'];
                 $query->where(function($q) use ($buscar) {
@@ -123,9 +109,6 @@ class TicketController
         }
     }
 
-    /**
-     * Obtener ticket por ID
-     */
     public function obtener(Request $request, Response $response, array $args)
     {
         try {
@@ -158,9 +141,6 @@ class TicketController
         }
     }
 
-    /**
-     * Actualizar estado del ticket (solo administradores)
-     */
     public function actualizarEstado(Request $request, Response $response, array $args)
     {
         try {
@@ -185,7 +165,6 @@ class TicketController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
-            // Validar estado
             if (!array_key_exists($data['estado'], Ticket::ESTADOS)) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -217,9 +196,6 @@ class TicketController
         }
     }
 
-    /**
-     * Asignar ticket a administrador
-     */
     public function asignar(Request $request, Response $response, array $args)
     {
         try {
@@ -267,9 +243,6 @@ class TicketController
         }
     }
 
-    /**
-     * Agregar comentario al ticket
-     */
     public function agregarComentario(Request $request, Response $response, array $args)
     {
         try {

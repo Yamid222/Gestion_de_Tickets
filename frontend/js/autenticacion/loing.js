@@ -1,7 +1,3 @@
-// Manejo de login en el frontend
-// Por ahora se asume que el microservicio de usuarios expone un endpoint /login
-// que devuelve { success, data: { token, user: { id, role, name, email } } }
-
 const formLogin = document.getElementById('form-login');
 const mensajeLogin = document.getElementById('mensaje-login');
 
@@ -46,11 +42,8 @@ if (formLogin) {
 
             const { token, user } = data.data;
 
-            // Guardar token y datos básicos en localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('usuario', JSON.stringify(user));
-
-            // Redirigir según rol
             if (user.role === 'admin') {
                 window.location.href = 'panel-admin.html';
             } else {

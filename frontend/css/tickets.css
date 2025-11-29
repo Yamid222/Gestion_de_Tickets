@@ -1,7 +1,3 @@
-/* ============================================
-   ESTILOS PARA TICKETS
-   ============================================ */
-
 .lista-tickets {
     display: flex;
     flex-direction: column;
@@ -11,7 +7,6 @@
     padding-right: 0.5rem;
 }
 
-/* Scrollbar personalizado */
 .lista-tickets::-webkit-scrollbar {
     width: 8px;
 }
@@ -168,10 +163,6 @@
     display: block;
 }
 
-/* ============================================
-   DETALLE DE TICKET
-   ============================================ */
-
 .detalle-ticket {
     margin-top: 1.5rem;
 }
@@ -234,10 +225,6 @@
     line-height: 1.6;
 }
 
-/* ============================================
-   ACTIVIDADES/COMENTARIOS
-   ============================================ */
-
 .ticket-actividades {
     margin-bottom: 1.5rem;
 }
@@ -278,10 +265,6 @@
     font-size: 0.85rem;
 }
 
-/* ============================================
-   AGREGAR COMENTARIO
-   ============================================ */
-
 .agregar-comentario {
     background-color: var(--color-gris-claro);
     padding: 1.5rem;
@@ -315,10 +298,6 @@
 .agregar-comentario .btn-primario {
     width: 100%;
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
     .detalle-ticket-contenido {

@@ -1,6 +1,3 @@
-// Validar que exista un token válido antes de mostrar pantallas protegidas
-// Si no hay token o es inválido, redirige al login
-
 (async function () {
     const token = localStorage.getItem('token');
 
@@ -9,7 +6,6 @@
         return;
     }
 
-    // Validar el token con el backend
     try {
         const resultado = await apiValidarToken();
         
@@ -20,7 +16,6 @@
             return;
         }
 
-        // Actualizar datos del usuario en localStorage si es necesario
         if (resultado.data && resultado.data.user) {
             localStorage.setItem('usuario', JSON.stringify(resultado.data.user));
         }

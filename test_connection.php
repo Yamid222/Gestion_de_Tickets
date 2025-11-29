@@ -1,6 +1,5 @@
 <?php
 
-// Script para probar la conexión a la base de datos
 require 'microservicio-usuarios/vendor/autoload.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -23,7 +22,6 @@ try {
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
-    // Probar la conexión
     $users = Capsule::table('users')->count();
     $tickets = Capsule::table('tickets')->count();
     

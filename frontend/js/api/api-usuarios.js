@@ -1,5 +1,3 @@
-// Funciones para consumir el microservicio de usuarios
-
 async function apiListarUsuarios() {
     const token = localStorage.getItem('token');
 
@@ -155,7 +153,6 @@ async function apiLogout() {
         }
     });
 
-    // Siempre eliminar del localStorage, incluso si falla el logout en el servidor
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
 

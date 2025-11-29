@@ -1,12 +1,7 @@
 <?php
 
-/**
- * Script para probar que ambos microservicios estén corriendo y accesibles
- */
-
 echo "🔍 Verificando microservicios...\n\n";
 
-// Probar microservicio de usuarios
 echo "1. Microservicio de Usuarios (http://localhost:8000):\n";
 $ch = curl_init('http://localhost:8000/');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -32,7 +27,6 @@ if ($error) {
 
 echo "\n";
 
-// Probar microservicio de tickets
 echo "2. Microservicio de Tickets (http://localhost:8001):\n";
 $ch = curl_init('http://localhost:8001/');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -58,7 +52,6 @@ if ($error) {
 
 echo "\n";
 
-// Probar endpoint de validación de token (sin token, debería fallar pero devolver JSON)
 echo "3. Endpoint de validación de token:\n";
 $ch = curl_init('http://localhost:8000/api/auth/validate-token');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

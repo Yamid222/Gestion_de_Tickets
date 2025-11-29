@@ -12,16 +12,11 @@ class AuthMiddleware
 
     public function __construct()
     {
-        // URL del microservicio de usuarios - ajustar según tu configuración
-        $this->userServiceUrl = 'http://localhost:8000/api'; // Puerto del microservicio de usuarios
+        $this->userServiceUrl = 'http://localhost:8000/api';
     }
 
-    /**
-     * Middleware para verificar autenticación mediante llamada HTTP
-     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
-        // Obtener el token del header Authorization
         $authHeader = $request->getHeader('Authorization');
         
         if (empty($authHeader)) {
@@ -35,7 +30,6 @@ class AuthMiddleware
 
         $token = $authHeader[0];
         
-        // Remover el prefijo "Bearer " si existe
         $token = str_replace('Bearer ', '', $token);
 
         if (empty($token)) {
@@ -47,7 +41,6 @@ class AuthMiddleware
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
-        // Validar el token mediante llamada HTTP al microservicio de usuarios
         $userInfo = $this->validateTokenWithUserService($token);
 
         if (!$userInfo) {
@@ -59,15 +52,11 @@ class AuthMiddleware
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
-        // Agregar información del usuario al request
         $request = $request->withAttribute('user', $userInfo);
 
         return $handler->handle($request);
     }
 
-    /**
-     * Validar token con el microservicio de usuarios
-     */
     private function validateTokenWithUserService($token)
     {
         try {
@@ -87,12 +76,10 @@ class AuthMiddleware
             $curlError = curl_error($ch);
             curl_close($ch);
 
-            // Log para depuración (puedes remover esto después)
             if ($curlError) {
                 error_log("Error CURL al validar token: " . $curlError);
             }
 
-            // Verificar si la respuesta es HTML (error del servidor)
             if (strpos($response, '<!doctype') !== false || strpos($response, '<html') !== false) {
                 error_log("El microservicio de usuarios devolvió HTML en lugar de JSON. URL: $url");
                 error_log("Respuesta: " . substr($response, 0, 500));
@@ -106,7 +93,6 @@ class AuthMiddleware
                 }
             }
 
-            // Log para depuración
             error_log("Token validation failed. HTTP Code: $httpCode, URL: $url");
             error_log("Response: " . substr($response, 0, 200));
 
@@ -120,9 +106,6 @@ class AuthMiddleware
 
 class AdminMiddleware
 {
-    /**
-     * Middleware para verificar que el usuario sea administrador
-     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $user = $request->getAttribute('user');
@@ -142,9 +125,6 @@ class AdminMiddleware
 
 class GestorMiddleware
 {
-    /**
-     * Middleware para verificar que el usuario sea gestor o administrador
-     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $user = $request->getAttribute('user');

@@ -1,7 +1,3 @@
-/* ============================================
-   ESTILOS GENERALES
-   ============================================ */
-
 * {
     margin: 0;
     padding: 0;
@@ -35,10 +31,6 @@ body {
     min-height: 100vh;
 }
 
-/* ============================================
-   TIPOGRAFÍA
-   ============================================ */
-
 h1, h2, h3, h4, h5, h6 {
     color: var(--color-texto);
     font-weight: 600;
@@ -60,10 +52,6 @@ h3 {
 h4 {
     font-size: 1.1rem;
 }
-
-/* ============================================
-   BOTONES
-   ============================================ */
 
 .btn-primario,
 .btn-secundario {
@@ -105,10 +93,6 @@ h4 {
     background-color: var(--color-gris-claro);
 }
 
-/* ============================================
-   FORMULARIOS
-   ============================================ */
-
 .campo-form {
     margin-bottom: 1.5rem;
 }
@@ -148,10 +132,6 @@ h4 {
     color: var(--color-texto-claro);
 }
 
-/* ============================================
-   MENSAJES
-   ============================================ */
-
 .mensaje {
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
@@ -176,10 +156,6 @@ h4 {
     color: #1e40af;
     border: 1px solid #3b82f6;
 }
-
-/* ============================================
-   UTILIDADES
-   ============================================ */
 
 .contenedor-principal {
     min-height: 100vh;
@@ -226,10 +202,6 @@ h4 {
     color: var(--color-azul-oscuro);
     font-weight: 500;
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
     .contenedor-principal {

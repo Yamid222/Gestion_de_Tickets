@@ -1,9 +1,3 @@
-// Configuración de consumo del microservicio de tickets
-
-// BASE_URL_TICKETS se define en configuracion.js
-
-// Funciones para consumir el microservicio de tickets
-
 async function apiListarTickets(params = {}) {
     const token = localStorage.getItem('token');
     const query = new URLSearchParams(params).toString();
@@ -45,7 +39,6 @@ async function apiCrearTicket({ titulo, descripcion, gestor_id }) {
             })
         });
 
-        // Verificar el Content-Type de la respuesta
         const contentType = resp.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await resp.text();

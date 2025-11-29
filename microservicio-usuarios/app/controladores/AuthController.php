@@ -9,15 +9,11 @@ use App\Models\AuthToken;
 
 class AuthController
 {
-    /**
-     * Registro de usuario
-     */
     public function registro(Request $request, Response $response)
     {
         try {
             $data = json_decode($request->getBody()->getContents(), true);
 
-            // Validaciones básicas
             if (empty($data['name']) || empty($data['email']) || empty($data['password']) || empty($data['role'])) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -26,7 +22,6 @@ class AuthController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Validar que el rol sea válido
             if (!in_array($data['role'], ['gestor', 'admin'])) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -35,7 +30,6 @@ class AuthController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Verificar si el email ya existe
             if (User::where('email', $data['email'])->exists()) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -44,11 +38,10 @@ class AuthController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
             }
 
-            // Crear el usuario
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'], // Se hashea automáticamente en el modelo
+                'password' => $data['password'],
                 'role' => $data['role']
             ]);
 
@@ -66,7 +59,6 @@ class AuthController
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
         } catch (\Exception $e) {
-            // Exponemos el mensaje de la excepción para depuración
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Error interno del servidor: ' . $e->getMessage(),
@@ -76,15 +68,11 @@ class AuthController
         }
     }
 
-    /**
-     * Inicio de sesión
-     */
     public function login(Request $request, Response $response)
     {
         try {
             $data = json_decode($request->getBody()->getContents(), true);
 
-            // Validaciones básicas
             if (empty($data['email']) || empty($data['password'])) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -93,7 +81,6 @@ class AuthController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Buscar el usuario
             $user = User::where('email', $data['email'])->first();
 
             if (!$user || !$user->verifyPassword($data['password'])) {
@@ -104,7 +91,6 @@ class AuthController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
             }
 
-            // Generar token
             $authToken = AuthToken::createTokenForUser($user->id);
 
             $response->getBody()->write(json_encode([
@@ -133,9 +119,6 @@ class AuthController
         }
     }
 
-    /**
-     * Cerrar sesión
-     */
     public function logout(Request $request, Response $response)
     {
         try {
@@ -150,7 +133,6 @@ class AuthController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Eliminar el token
             $deleted = AuthToken::where('token', $token)->delete();
 
             if (!$deleted) {
@@ -178,9 +160,6 @@ class AuthController
         }
     }
 
-    /**
-     * Validar token y obtener usuario
-     */
     public function validateToken(Request $request, Response $response)
     {
         try {

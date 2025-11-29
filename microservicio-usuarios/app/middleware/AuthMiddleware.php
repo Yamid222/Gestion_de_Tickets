@@ -10,12 +10,8 @@ use App\Models\User;
 
 class AuthMiddleware
 {
-    /**
-     * Middleware para verificar autenticación
-     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
-        // Obtener el token del header Authorization
         $authHeader = $request->getHeader('Authorization');
         
         if (empty($authHeader)) {
@@ -38,7 +34,6 @@ class AuthMiddleware
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
-        // Validar el token
         $user = AuthToken::getUserByToken($token);
 
         if (!$user) {
@@ -50,7 +45,6 @@ class AuthMiddleware
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
-        // Agregar información del usuario al request
         $request = $request->withAttribute('user', $user);
 
         return $handler->handle($request);
@@ -59,9 +53,6 @@ class AuthMiddleware
 
 class AdminMiddleware
 {
-    /**
-     * Middleware para verificar que el usuario sea administrador
-     */
     public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $user = $request->getAttribute('user');

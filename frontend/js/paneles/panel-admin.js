@@ -1,11 +1,6 @@
-// Script para el panel de administrador
-// Maneja: gestión de tickets (ver todos, filtrar, actualizar estado, asignar, comentarios)
-// y gestión de usuarios (listar, actualizar, eliminar)
-
 (function() {
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
     
-    // Verificar que sea admin
     if (usuario.role !== 'admin') {
         window.location.href = 'index.html';
         return;
@@ -53,14 +48,12 @@
         detalleTicket.innerHTML = '';
     }
 
-    // Cargar datos al iniciar
     cargarTickets();
     cargarUsuarios();
     crearFiltros();
     renderFormularioCrearUsuario();
     configurarToggleFormulario();
 
-    // Crear interfaz de filtros
     function crearFiltros() {
         const html = `
             <div class="filtros-contenedor">
@@ -99,11 +92,9 @@
 
         filtrosTickets.innerHTML = html;
 
-        // Event listeners para filtros
         document.getElementById('btn-aplicar-filtros').addEventListener('click', aplicarFiltros);
         document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
         
-        // Búsqueda en tiempo real (cuando se presiona Enter)
         const buscarInput = document.getElementById('buscar-ticket');
         if (buscarInput) {
             buscarInput.addEventListener('keypress', (e) => {
@@ -113,11 +104,9 @@
             });
         }
 
-        // Llenar selectores con usuarios
         cargarUsuariosEnFiltros();
     }
 
-    // Cargar usuarios en los filtros
     function cargarUsuariosEnFiltros() {
         const selectGestor = document.getElementById('filtro-gestor');
         const selectAdmin = document.getElementById('filtro-admin');
@@ -150,7 +139,6 @@
         }
     }
 
-    // Aplicar filtros
     function aplicarFiltros() {
         const buscar = document.getElementById('buscar-ticket').value.trim();
         const estado = document.getElementById('filtro-estado').value;
@@ -171,7 +159,6 @@
         cargarTickets(params);
     }
 
-    // Limpiar filtros
     function limpiarFiltros() {
         document.getElementById('buscar-ticket').value = '';
         document.getElementById('filtro-estado').value = '';
@@ -180,7 +167,6 @@
         cargarTickets();
     }
 
-    // Cargar todos los tickets
     async function cargarTickets(params = {}) {
         try {
             const resultado = await apiListarTickets(params);
@@ -196,7 +182,6 @@
         }
     }
 
-    // Mostrar lista de tickets
     function mostrarTickets(tickets) {
         if (!listaTickets) return;
         cacheTickets = Array.isArray(tickets) ? tickets : [];
@@ -338,7 +323,6 @@
             actividadesHtml = '<p>No hay comentarios aún</p>';
         }
 
-        // Opciones de administradores para asignar
         const adminsOptions = todosLosUsuarios
             .filter(u => u.role === 'admin')
             .map(admin => {
@@ -528,7 +512,6 @@
         elemento.className = `mensaje ${esExito ? 'exito' : 'error'}`;
     }
 
-    // Renderizar formulario de creación de usuarios
     function renderFormularioCrearUsuario() {
         if (!formularioCrearUsuario) return;
 
@@ -645,7 +628,6 @@
         btnToggleFormUsuario.textContent = 'Crear usuario';
     }
 
-    // Cargar usuarios
     async function cargarUsuarios() {
         try {
             const resultado = await apiListarUsuarios();
@@ -666,7 +648,6 @@
         }
     }
 
-    // Mostrar lista de usuarios
     function mostrarUsuarios(usuarios) {
         if (usuarios.length === 0) {
             listaUsuarios.innerHTML = '<p>No hay usuarios</p>';
@@ -694,7 +675,6 @@
 
         listaUsuarios.innerHTML = html;
 
-        // Event listeners
         document.querySelectorAll('.btn-editar-usuario').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const userId = e.target.getAttribute('data-id');
@@ -710,7 +690,6 @@
         });
     }
 
-    // Mostrar formulario de edición
     function mostrarFormularioEditar(userId) {
         const user = todosLosUsuarios.find(u => u.id == userId);
         if (!user) return;
@@ -743,7 +722,6 @@
 
         listaUsuarios.innerHTML = html;
 
-        // Event listeners
         document.getElementById('form-editar-usuario').addEventListener('submit', async (e) => {
             e.preventDefault();
             const userId = e.target.getAttribute('data-user-id');
@@ -777,7 +755,6 @@
         });
     }
 
-    // Eliminar usuario
     async function eliminarUsuario(userId) {
         if (!confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
             return;

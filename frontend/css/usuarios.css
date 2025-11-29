@@ -1,7 +1,3 @@
-/* ============================================
-   ESTILOS PARA GESTIÓN DE USUARIOS
-   ============================================ */
-
 .seccion-usuarios {
     display: flex;
     flex-direction: column;
@@ -66,7 +62,6 @@
     padding-right: 0.5rem;
 }
 
-/* Scrollbar personalizado */
 .lista-usuarios::-webkit-scrollbar {
     width: 8px;
 }
@@ -181,10 +176,6 @@
     box-shadow: var(--sombra-suave);
 }
 
-/* ============================================
-   FORMULARIO DE EDICIÓN DE USUARIO
-   ============================================ */
-
 .formulario-editar-usuario {
     background-color: var(--color-blanco);
     border: 2px solid var(--color-azul-primario);
@@ -216,10 +207,6 @@
     background-color: var(--color-gris-oscuro);
     color: var(--color-blanco);
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
     .usuario-item {

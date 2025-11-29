@@ -8,9 +8,6 @@ use App\Models\User;
 
 class UserController
 {
-    /**
-     * Listar todos los usuarios (solo administradores)
-     */
     public function listar(Request $request, Response $response)
     {
         try {
@@ -35,9 +32,6 @@ class UserController
         }
     }
 
-    /**
-     * Crear un nuevo usuario
-     */
     public function crear(Request $request, Response $response)
     {
         try {
@@ -117,9 +111,6 @@ class UserController
         }
     }
 
-    /**
-     * Obtener usuario por ID
-     */
     public function obtener(Request $request, Response $response, array $args)
     {
         try {
@@ -152,9 +143,6 @@ class UserController
         }
     }
 
-    /**
-     * Actualizar usuario
-     */
     public function actualizar(Request $request, Response $response, array $args)
     {
         try {
@@ -171,7 +159,6 @@ class UserController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
 
-            // Campos actualizables
             $camposPermitidos = ['name', 'email', 'role'];
             $datosActualizacion = [];
 
@@ -181,7 +168,6 @@ class UserController
                 }
             }
 
-            // Validar rol si se está actualizando
             if (isset($datosActualizacion['role']) && !in_array($datosActualizacion['role'], ['gestor', 'admin'])) {
                 $response->getBody()->write(json_encode([
                     'success' => false,
@@ -190,7 +176,6 @@ class UserController
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Verificar email único si se está actualizando
             if (isset($datosActualizacion['email']) && 
                 User::where('email', $datosActualizacion['email'])->where('id', '!=', $userId)->exists()) {
                 $response->getBody()->write(json_encode([
@@ -234,9 +219,6 @@ class UserController
         }
     }
 
-    /**
-     * Eliminar usuario
-     */
     public function eliminar(Request $request, Response $response, array $args)
     {
         try {
